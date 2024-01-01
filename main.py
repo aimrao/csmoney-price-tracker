@@ -11,6 +11,8 @@ from discord_webhook import DiscordWebhook
 load_dotenv()   # initializing env vars from .env file
 api = os.environ.get('api_key')
 discord_url = os.environ.get('discord_url')
+data_dir = os.environ.get('data_dir')
+queries = os.environ.get('queries')
 logging.basicConfig(stream=sys.stdout, level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def send_discord(discord_url, message):
@@ -57,14 +59,14 @@ def prettify(data):
     return result
 
 def cache_item(item):
-    with open('data','a') as f:
+    with open('{}/data'.format(data_dir),'a') as f:
         f.write(json.dumps(item))
         f.write('\n')
     return 0
 
 def check_cache(item):
     try:
-        with open('data', 'r') as f:
+        with open('{}/data'.format(data_dir), 'r') as f:
             lines = f.readlines()
             for line in lines:
                 if json.loads(line)['id'] == item['id']:
@@ -102,12 +104,11 @@ def csmoney_scraper(name, max_float, max_price, wear ):
         return csmoney_parser(raw_data=raw_data)
     else:
         logging.error(response.status_code)
-        return
+        return []
 
 def main():
-    for item in csmoney_scraper(name="AK-47 Bloodsport", max_float=0.2, max_price=inr_to_usd(amount=7200), wear=["ft", "mw"]):
-        if not check_cache(item=item):
-            cache_item(item=item)
-            send_discord(discord_url=discord_url, message=prettify(item))
-
-main()
+    for query in json.loads(queries):
+        for item in csmoney_scraper(name=query[0], max_float=query[1], max_price=inr_to_usd(amount=query[2]), wear=query[3]):
+            if not check_cache(item=item):
+                cache_item(item=item)
+                send_discord(discord_url=discord_url, message=prettify(item))
