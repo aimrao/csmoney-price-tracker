@@ -27,5 +27,5 @@ sudo docker run -d --name csmoney-price-tracker --env-file ./path_to_env/.env -v
 Or, 
 use the prebuilt image:
 ```sh
-sudo docker run -d --name csmoney-price-tracker --env-file ./path_to_env/.env -v path_to_data_dir/:/data_dir --log-opt max-size=10m --log-opt max-file=3 aimrao/csmoney-price-tracker
+sudo docker run -d --name csmoney-price-tracker --env-file ./path_to_env/.env -v path_to_data_dir/:/data_dir --log-opt max-size=10m --log-opt max-file=3 4imrao/csmoney-price-tracker
 ```
