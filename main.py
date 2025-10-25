@@ -7,6 +7,7 @@ from datetime import datetime, date
 from urllib.parse import quote
 from dotenv import load_dotenv
 from discord_webhook import DiscordWebhook
+import cloudscraper
 
 load_dotenv()   # load env file
 
@@ -112,7 +113,8 @@ def csmoney_scraper(name, max_float, max_price, wear ):
     url = "https://cs.money/1.0/market/sell-orders?limit=60&maxFloat={}&maxPrice={}&name={}".format(max_float, max_price, quote(name))
     for quality in wear:
         url += "&quality={}".format(quality)
-    response = requests.get(url=url)
+    scraper = cloudscraper.create_scraper()
+    response = scraper.get(url, timeout=15)
     if response.status_code == 200:
         raw_data = json.loads(response.content)
         return csmoney_parser(raw_data=raw_data)
